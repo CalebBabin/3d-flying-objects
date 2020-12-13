@@ -115,7 +115,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		bounce(main);
 		main.position.x += main.velocity.x * delta * 100;
 		main.position.y += main.velocity.y * delta * 100;
-		ctx.fillStyle = '#ff0000';
+		ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
 		ctx.fillRect(
 			main.position.x,
 			main.position.y,
