@@ -22,7 +22,14 @@ const PI2 = Math.PI * 2;
 const emoteTextures = {};
 const pendingEmoteArray = [];
 ChatInstance.on("emotes", (e) => {
-	const output = { emotes: [] };
+
+	const direction = Math.random() * PI2;
+	const output = { 
+		position: { x: main.position.x + main.width/2, y: main.position.y + main.height/2 },
+		velocity: { x: Math.sin(direction), y: Math.cos(direction) },
+		emotes: [],
+		life: 0,
+	};
 	for (let index = 0; index < e.emotes.length; index++) {
 		const emote = e.emotes[index];
 		if (!emoteTextures[emote.material.id]) {
@@ -31,15 +38,14 @@ ChatInstance.on("emotes", (e) => {
 		emote.texture = emoteTextures[emote.material.id];
 		output.emotes.push(emote);
 	}
-	const direction = Math.random() * PI2;
-	pendingEmoteArray.push({
-		position: { x: main.position.x, y: main.position.y },
-		velocity: { x: Math.sin(direction), y: Math.cos(direction) },
-		height: emoteSize,
-		width: emoteSize * output.emotes.length,
-		emotes: output.emotes,
-		life: 0,
-	});
+	output.height = emoteSize;
+	output.width = emoteSize * output.emotes.length;
+
+	output.position.x -= output.width/2;
+	output.position.y -= output.height/2;
+
+
+	pendingEmoteArray.push(output);
 })
 
 const canvas = document.createElement('canvas');
