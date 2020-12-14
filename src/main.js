@@ -137,13 +137,22 @@ window.addEventListener('DOMContentLoaded', () => {
 		main.position.x += main.velocity.x * delta * 100;
 		main.position.y += main.velocity.y * delta * 100;
 		ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-		ctx.drawImage(
-			frames[main.frame],
+		ctx.save();
+		ctx.translate(
 			main.position.x,
 			main.position.y,
+		);
+		if (main.velocity.x <= 0) {
+			ctx.scale(-1, 1);
+		}
+		ctx.drawImage(
+			frames[main.velocity.x > 0 ? main.frame : (frames.length - 1) - main.frame],
+			0 + (main.velocity.x <= 0 ? -main.width : 0),
+			0,
 			main.width,
 			main.height * (frames[main.frame].height / frames[main.frame].width),
 		)
+		ctx.restore();
 		main.frame++;
 		if (main.frame >= main.frames) main.frame = 0;
 	}
