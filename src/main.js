@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import Chat from 'twitch-chat-emotes';
 
+import frames from './face';
+
 let channels = ['moonmoon'];
 const query_vars = {};
 const query_parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
@@ -24,8 +26,8 @@ const pendingEmoteArray = [];
 ChatInstance.on("emotes", (e) => {
 
 	const direction = Math.random() * PI2;
-	const output = { 
-		position: { x: main.position.x + main.width/2, y: main.position.y + main.height/2 },
+	const output = {
+		position: { x: main.position.x + main.width / 2, y: main.position.y + main.height / 2 },
 		velocity: { x: Math.sin(direction), y: Math.cos(direction) },
 		emotes: [],
 		life: 0,
@@ -41,8 +43,8 @@ ChatInstance.on("emotes", (e) => {
 	output.height = emoteSize;
 	output.width = emoteSize * output.emotes.length;
 
-	output.position.x -= output.width/2;
-	output.position.y -= output.height/2;
+	output.position.x -= output.width / 2;
+	output.position.y -= output.height / 2;
 
 
 	pendingEmoteArray.push(output);
@@ -57,24 +59,37 @@ const main = {
 	velocity: { x: Math.sin(mainDirection), y: Math.cos(mainDirection) },
 	width: emoteSize * 4,
 	height: emoteSize * 4,
+	frame: 0,
+	frames: 600
+};
+
+const vary = (element) => {
+	let rad = Math.atan2(element.velocity.x, element.velocity.y); // In radians
+	rad += (Math.random() * 2 - 1) * (Math.PI / 10);
+	element.velocity.x = Math.sin(rad);
+	element.velocity.y = Math.cos(rad);
 }
 
 const bounce = (element) => {
 	if (element.position.x + element.width >= window.innerWidth) {
 		element.position.x = window.innerWidth - (element.width + 0.0001);
 		element.velocity.x *= -1;
+		vary(element);
 	}
 	if (element.position.y + element.height >= window.innerHeight) {
 		element.position.y = window.innerHeight - (element.height + 0.0001);
 		element.velocity.y *= -1;
+		vary(element);
 	}
 	if (element.position.x <= 0) {
 		element.position.x = 0.0001;
 		element.velocity.x *= -1;
+		vary(element);
 	}
 	if (element.position.y <= 0) {
 		element.position.y = 0.0001;
 		element.velocity.y *= -1;
+		vary(element);
 	}
 }
 
@@ -122,18 +137,21 @@ window.addEventListener('DOMContentLoaded', () => {
 		main.position.x += main.velocity.x * delta * 100;
 		main.position.y += main.velocity.y * delta * 100;
 		ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-		ctx.fillRect(
+		ctx.drawImage(
+			frames[main.frame],
 			main.position.x,
 			main.position.y,
 			main.width,
-			main.height,
+			main.height * (frames[main.frame].height / frames[main.frame].width),
 		)
+		main.frame++;
+		if (main.frame >= main.frames) main.frame = 0;
 	}
 
 	resize();
-		
-	main.position.x = canvas.width/2 - main.width/2;
-	main.position.y = canvas.height/2 - main.height/2;
+
+	main.position.x = canvas.width / 2 - main.width / 2;
+	main.position.y = canvas.height / 2 - main.height / 2;
 
 	init();
 	draw();
