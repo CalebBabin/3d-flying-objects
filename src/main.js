@@ -16,6 +16,7 @@ const ChatInstance = new Chat({
 	channels,
 	duplicateEmoteLimit: 1,
 	duplicateEmoteLimit_pleb: 0,
+	maximumEmoteLimit_pleb: 1,
 })
 
 const emoteSize = 56;
@@ -55,6 +56,7 @@ ChatInstance.on("emotes", (e) => {
 
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 
 const mainDirection = Math.random() * PI2;
 const main = {

@@ -13,6 +13,7 @@ moonImg.addEventListener('load', () => {
 		frames[index].width = Math.ceil(moonImg.width);
 		frames[index].height = Math.ceil(moonImg.height * variance);
 		const ctx = frames[index].getContext('2d');
+		ctx.imageSmoothingEnabled = false;
 
 		for (let x = 0; x < moonImg.width; x++) {
 			ctx.drawImage(
