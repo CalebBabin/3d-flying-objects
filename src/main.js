@@ -19,16 +19,18 @@ const ChatInstance = new Chat({
 })
 
 const emoteSize = 56;
+const emoteLife = 8;
+const emoteFadeStart = 6;
+const emoteFadeDif = emoteLife - emoteFadeStart;
 const PI2 = Math.PI * 2;
 
 const emoteTextures = {};
 const pendingEmoteArray = [];
 ChatInstance.on("emotes", (e) => {
 
-	const direction = Math.random() * PI2;
 	const output = {
 		position: { x: main.position.x + main.width / 2, y: main.position.y + main.height / 2 },
-		velocity: { x: Math.sin(direction), y: Math.cos(direction) },
+		velocity: { x: -main.velocity.x, y: -main.velocity.y },
 		emotes: [],
 		life: 0,
 	};
@@ -46,6 +48,7 @@ ChatInstance.on("emotes", (e) => {
 	output.position.x -= output.width / 2;
 	output.position.y -= output.height / 2;
 
+	vary(output, 0.9);
 
 	pendingEmoteArray.push(output);
 })
@@ -63,9 +66,13 @@ const main = {
 	frames: 600
 };
 
-const vary = (element) => {
+function easeOutCubic(x) {
+	return 1 - Math.pow(1 - x, 3);
+}
+
+const vary = (element, amount = 0.3141592653589793) => {
 	let rad = Math.atan2(element.velocity.x, element.velocity.y); // In radians
-	rad += (Math.random() * 2 - 1) * (Math.PI / 10);
+	rad += (Math.random() * 2 - 1) * amount;
 	element.velocity.x = Math.sin(rad);
 	element.velocity.y = Math.cos(rad);
 }
@@ -119,16 +126,18 @@ window.addEventListener('DOMContentLoaded', () => {
 			bounce(element);
 
 			element.life += delta;
+			const scale = element.life > emoteFadeStart ? 1 - easeOutCubic((element.life - emoteFadeStart) / emoteFadeDif) : 1;
+
 			for (let i = 0; i < element.emotes.length; i++) {
 				const emote = element.emotes[i];
 				ctx.drawImage(emote.material.canvas,
-					(element.position.x + emoteSize * i),
+					(element.position.x + (emoteSize * i) * scale),
 					(element.position.y),
-					(emoteSize),
-					(emoteSize * (emote.material.canvas.height / emote.material.canvas.width)));
+					(emoteSize) * scale,
+					(emoteSize * (emote.material.canvas.height / emote.material.canvas.width)) * scale);
 			}
 
-			if (element.life > 5) {
+			if (element.life > emoteLife) {
 				pendingEmoteArray.splice(index, 1);
 			}
 		}
