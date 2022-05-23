@@ -20,7 +20,7 @@ const ChatInstance = new Chat({
 })
 
 const emoteSize = 56;
-const emoteLife = 30;
+const emoteLife = 20;
 const emoteFadeStart = 10;
 const emoteFadeDif = emoteLife - emoteFadeStart;
 const PI2 = Math.PI * 2;
@@ -28,10 +28,11 @@ const PI2 = Math.PI * 2;
 const emoteTextures = {};
 const pendingEmoteArray = [];
 ChatInstance.on("emotes", (e) => {
+	const speed = Math.random() * 0.2 + 0.8;
 
 	const output = {
 		position: { x: main.position.x + main.width / 2, y: main.position.y + main.height / 2 },
-		velocity: { x: -main.velocity.x, y: -main.velocity.y },
+		velocity: { x: -main.velocity.x * speed, y: -main.velocity.y * speed },
 		emotes: [],
 		life: 0,
 	};
@@ -49,7 +50,7 @@ ChatInstance.on("emotes", (e) => {
 	output.position.x -= output.width / 2;
 	output.position.y -= output.height / 2;
 
-	vary(output, 0.9);
+	vary(output, 0.1);
 
 	pendingEmoteArray.push(output);
 })
@@ -79,26 +80,26 @@ const vary = (element, amount = 0.3141592653589793) => {
 	element.velocity.y = Math.cos(rad);
 }
 
-const bounce = (element) => {
+const bounce = (element, variance = undefined) => {
 	if (element.position.x + element.width >= window.innerWidth) {
 		element.position.x = window.innerWidth - (element.width + 0.0001);
 		element.velocity.x *= -1;
-		vary(element);
+		vary(element, variance);
 	}
 	if (element.position.y + element.height >= window.innerHeight) {
 		element.position.y = window.innerHeight - (element.height + 0.0001);
 		element.velocity.y *= -1;
-		vary(element);
+		vary(element, variance);
 	}
 	if (element.position.x <= 0) {
 		element.position.x = 0.0001;
 		element.velocity.x *= -1;
-		vary(element);
+		vary(element, variance);
 	}
 	if (element.position.y <= 0) {
 		element.position.y = 0.0001;
 		element.velocity.y *= -1;
-		vary(element);
+		vary(element, variance);
 	}
 }
 
@@ -125,7 +126,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			element.position.x += element.velocity.x * delta * 150;
 			element.position.y += element.velocity.y * delta * 150;
 
-			bounce(element);
+			bounce(element, 0.15);
 
 			element.life += delta;
 			const scale = element.life > emoteFadeStart ? 1 - easeOutCubic((element.life - emoteFadeStart) / emoteFadeDif) : 1;
