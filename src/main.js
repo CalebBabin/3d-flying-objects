@@ -20,8 +20,8 @@ const ChatInstance = new Chat({
 })
 
 const emoteSize = 56;
-const emoteLife = 8;
-const emoteFadeStart = 6;
+const emoteLife = 30;
+const emoteFadeStart = 20;
 const emoteFadeDif = emoteLife - emoteFadeStart;
 const PI2 = Math.PI * 2;
 
